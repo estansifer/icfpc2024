@@ -100,7 +100,7 @@ def submit(course, idx, solution, check_if_better_exists = True):
 
 def run():
     init_courses()
-    view_scores('lambdaman')
+    view_scores()
 
 if __name__ == '__main__':
     run()

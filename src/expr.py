@@ -78,6 +78,26 @@ class TreeExpr:
         sub_args = [arg.substitute(var_name, var_value) for arg in self.args]
         return TreeExpr(self.token, sub_args)
 
+    def to_token_list(self, accum = None):
+        if accum is None:
+            accum = []
+        accum.append(self.token)
+        for arg in self.args:
+            arg.to_token_list(accum)
+        return accum
+
+    def to_token_string(self):
+        return ' '.join(self.to_token_list())
+
+    def all_variables(self, vs = None):
+        if vs is None:
+            vs = set()
+        if self.indicator == 'v':
+            vs.add(self.name)
+        for arg in self.args:
+            arg.all_variables(vs)
+        return vs
+
     def __str__(self):
         if len(self.args) == 0:
             return self.token
