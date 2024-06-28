@@ -84,6 +84,27 @@ class TreeExpr:
         else:
             return self.token + '(' + ', '.join([str(arg) for arg in self.args]) + ')'
 
+    def pretty_print(self):
+        p = [a.pretty_print() for a in self.args]
+        if self.indicator == 'I':
+            return decode_integer(self.name)
+        elif self.indicator == 'S':
+            return '«' + decode_string(self.name) + '»'
+        elif self.indicator in 'TF':
+            return self.indicator
+        elif self.indicator == 'L':
+            return 'λ' + self.name + ': ' + p[0]
+        elif self.indicator == 'v':
+            return self.token
+        elif self.indicator == 'U':
+            return self.name + ' ' + p[0]
+        elif self.indicator == 'B':
+            return f'({p[0]}) {self.name} ({p[1]})'
+        elif self.indicator == '?':
+            return f'({p[0]}) ? ({p[1]}) : ({p[2]})'
+        else:
+            assert False
+
 def decode_integer(name):
     value = 0
     for c in name:
