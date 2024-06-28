@@ -1,2 +1,1 @@
-# icfpc2024
-icfpc 2024
+# Panicked Albatross -- icfpc2024
