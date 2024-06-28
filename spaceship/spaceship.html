@@ -16,10 +16,10 @@ canvas.height = 500 * window.devicePixelRatio;
 canvas.style.width = `${canvas.width / window.devicePixelRatio}px`;
 canvas.style.height = `${canvas.height / window.devicePixelRatio}px`;
 const parsedCoords = coords.textContent.trim().split('\n').map(str => str.split(' ').map(str => parseInt(str, 10)));
-let minX = Infinity;
-let minY = Infinity;
-let maxX = -Infinity;
-let maxY = -Infinity;
+let minX = 0;
+let minY = 0;
+let maxX = 0;
+let maxY = 0;
 for (const [x, y] of parsedCoords) {
     if (x < minX)
         minX = x;
@@ -39,10 +39,11 @@ function redraw() {
     const xScale = (canvas.width - 40) / (maxX - minX);
     const yScale = (canvas.height - 40) / (maxY - minY);
     const scale = Math.min(xScale, yScale);
-    ctx.scale(scale, scale);
-    ctx.translate(-minX, -minY);
+    ctx.scale(scale, -scale);
+    ctx.translate(-minX, -maxY);
     ctx.fillStyle = 'black';
     ctx.strokeStyle = 'black';
+    ctx.fillRect(-0.1, -0.1, 0.2, 0.2);
     for (const [x, y] of parsedCoords) {
         ctx.beginPath();
         ctx.ellipse(x, y, 0.1, 0.1, 0, 0, Math.PI * 2);
