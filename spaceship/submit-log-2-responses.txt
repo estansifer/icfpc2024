@@ -1,0 +1,90 @@
+ianh@imhmba src % python3 spaceship-submit.py ../spaceship/results/levels 
+solve spaceship15 274463335887885485733232295952514475844489663666564414454
+
+Correct, you solved spaceship15 with a score of 57!
+
+
+
+Correct, you solved spaceship14 with a score of 210!
+
+
+
+Correct, you solved spaceship16 with a score of 2828!
+
+
+
+Correct, you solved spaceship17 with a score of 958!
+
+
+
+Correct, you solved spaceship13 with a score of 580107!
+
+
+
+Correct, you solved spaceship12 with a score of 12329!
+
+
+
+Correct, you solved spaceship10 with a score of 929!
+
+
+
+Correct, you solved spaceship11 with a score of 8192!
+
+
+
+Correct, you solved spaceship9 with a score of 496!
+
+
+
+Correct, you solved spaceship8 with a score of 151!
+
+
+
+Correct, you solved spaceship5 with a score of 234!
+
+
+
+Correct, you solved spaceship4 with a score of 172!
+
+
+
+Correct, you solved spaceship6 with a score of 504!
+
+
+
+Correct, you solved spaceship7 with a score of 227!
+
+
+
+Correct, you solved spaceship3 with a score of 20!
+
+
+
+Correct, you solved spaceship2 with a score of 49!
+
+
+
+Correct, you solved spaceship1 with a score of 5!
+
+
+
+Correct, you solved spaceship20 with a score of 13369!
+
+
+
+Correct, you solved spaceship21 with a score of 13978!
+
+
+
+Correct, you solved spaceship22 with a score of 4652!
+
+
+
+Correct, you solved spaceship19 with a score of 23724!
+
+
+
+Correct, you solved spaceship18 with a score of 4940!
+
+ianh@imhmba src % 
