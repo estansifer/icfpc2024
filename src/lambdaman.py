@@ -33,7 +33,7 @@ class Task:
             self.ncol = len(self.board[0])
 
     def literal(self, moves):
-        self.solve = expr.encode_string(f'solve lambdaman{idx} {moves}')
+        self.solve = expr.encode_string(f'solve lambdaman{self.idx} {moves}')
         return self.solve
 
     def submit(self):
@@ -84,13 +84,17 @@ def solve_9(task):
     task.solve = result
 
 def test():
+    t = Task(1)
+    t.literal('UDLLLDURRRRRURR')
+    t.submit()
+
     # submit(1, literal(1, 'UDLLLDURRRRRURR'))
     # submit(6, solve_6())
     # submit(9, solve_9())
 
-    for i in range(1, 22):
-        if not i in [10, 21]:
-            Task(i).display()
+    # for i in range(1, 22):
+        # if not i in [10, 21]:
+            # Task(i).display()
 
 if __name__ == '__main__':
     test()
