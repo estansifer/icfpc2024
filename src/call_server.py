@@ -18,6 +18,7 @@ def post_icfp(icfp):
         method = 'POST')
     with urllib.request.urlopen(req) as response:
         return response.read().decode()
+    time.sleep(0.2)
 
 def repl():
     import readline
@@ -33,6 +34,14 @@ def repl():
     except EOFError:
         print()
         pass
+
+# also scoreboard, efficiency
+pages = ['index', 'lambdaman', 'spaceship', '3d']
+def save_page(page_name):
+    response = post_icfp(expr.encode_string('get ' + page_name))
+    text = expr.evaluate_string(response)
+    with open(f'../pages/{page_name}.md', 'w') as f:
+        f.write(text)
 
 def download_lambdaman():
     for i in range(1, 22):
