@@ -11,7 +11,7 @@ func = lam(lambda state: lam(lambda steps: lam(lambda f:
     )
 )))
 
-call = lam(lambda g: g(I(2983))(I(1000000))(g))(func)
+call = lam(lambda g: g(I(1))(I(1000000))(g))(func)
 
 for idx in range(1, 22):
     token_string = (S(f'solve lambdaman{idx} ') @ call).e.to_token_string()
