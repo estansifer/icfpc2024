@@ -1,6 +1,8 @@
 import call_server
 import expr
 from expr_dsl import *
+import functools
+import operator
 import task
 
 class Board:
@@ -20,12 +22,19 @@ class Board:
                         pass
                     self.pellets += line.count('.')
                     self.rows.append(line)
-    def sim(self, steps):
-        x = self.lx
-        y = self.ly
-        rows = self.rows
-        pellets_left = self.pellets
-        pellets_taken = set()
+    def sim(self, steps, previous_state=None):
+        if previous_state is not None:
+            x = previous_state[0]
+            y = previous_state[1]
+            rows = self.rows
+            pellets_left = previous_state[2]
+            pellets_taken = set(previous_state[3])
+        else:
+            x = self.lx
+            y = self.ly
+            rows = self.rows
+            pellets_left = self.pellets
+            pellets_taken = set()
         for step in steps:
             nx = x
             ny = y
@@ -48,7 +57,21 @@ class Board:
                 if destination == '.' and (x, y) not in pellets_taken:
                     pellets_left -= 1
                     pellets_taken.add((x, y))
-        return pellets_left
+        return (x, y, pellets_left, pellets_taken)
+    def distance_squared_to_closest_pellet(self, state):
+        lx = state[0]
+        ly = state[1]
+        pellets_taken = state[3]
+        min_distance_squared = 9999999999
+        for y in range(len(self.rows)):
+            for x in range(len(self.rows[y])):
+                if self.rows[y][x] == '.' and (x, y) not in pellets_taken:
+                    dx = lx - x
+                    dy = ly - y
+                    d2 = dx * dx + dy * dy
+                    if d2 < min_distance_squared:
+                        min_distance_squared = d2
+        return min_distance_squared
 
 params = 'glibc'
 
@@ -65,7 +88,7 @@ if params == 'random0':
         for _ in range(steps):
             result += 'UDRL'[(state + state // 2351) % 4]
             state = (state * 8121 + 28411) % 134456
-        return (result, state)
+        return result
 elif params == 'glibc':
     func = lam(lambda state: lam(lambda steps: lam(lambda f:
         (steps > I(0)).if_(
@@ -78,17 +101,41 @@ elif params == 'glibc':
         for _ in range(steps):
             result += 'UDRL'[(state + state // 22351) % 4]
             state = (state * 1103515245 + 12345) % (2 ** 31)
-        return (result, state)
+        return result
 
-idx = 18
-board = Board(idx)
-for seed in range(1000):
-    steps, _ = pyfunc(seed, 1000000)
-    result = board.sim(steps)
-    print(seed, board.pellets, result)
-    if result == 0:
-        call = lam(lambda g: g(I(seed))(I(1000000))(g))(func)
+steps_per_seed = 10000
+seeds_to_try = 5000
+
+steps_for_seed = [pyfunc(seed, steps_per_seed) for seed in range(seeds_to_try)]
+
+for idx in range(20, 22):
+    try:
+        board = Board(idx)
+    except:
+        continue
+    print('looking at', idx)
+    seeds = []
+    total_steps = 0
+    state = None
+    while total_steps < 1000000 and (state is None or state[2] > 0):
+        min_seed = 0
+        min_next_state = None
+        for seed in range(seeds_to_try):
+            next_state = board.sim(steps_for_seed[seed], previous_state=state)
+            if min_next_state is None or next_state[2] < min_next_state[2] or (next_state[2] == min_next_state[2] and board.distance_squared_to_closest_pellet(next_state) < board.distance_squared_to_closest_pellet(min_next_state)):
+                min_next_state = next_state
+                min_seed = seed
+                print(seed, board.pellets, next_state[2], board.distance_squared_to_closest_pellet(next_state))
+                if next_state[2] == 0:
+                    break
+        seeds.append(min_seed)
+        state = min_next_state
+        total_steps += steps_per_seed
+    if state[2] == 0:
+        print(seeds)
+        call = lam(lambda g:
+            functools.reduce(operator.matmul, map(lambda seed: g(I(seed))(I(steps_per_seed))(g), seeds))
+        )(func)
         token_string = (S(f'solve lambdaman{idx} ') @ call).e.to_token_string()
         print(token_string)
         task.submit('lambdaman', idx, token_string)
-        break
