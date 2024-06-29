@@ -21,6 +21,12 @@ class E:
     def if_(self, bar, baz):
         return E(T('?', [self.e, bar.e, baz.e]))
 
+    def drop(self, bar):
+        return bar.op('D', self)
+
+    def take(self, bar):
+        return bar.op('T', self)
+
     def __neg__(self, bar):
         return E(T('U-', [self.e]))
 

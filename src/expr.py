@@ -137,6 +137,8 @@ def decode_string(name):
 
 def encode_integer(i):
     result = []
+    if i == 0:
+        result.append(base94[0])
     while i > 0:
         result.append(base94[i % N94])
         i = (i // N94)
