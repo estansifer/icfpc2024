@@ -83,9 +83,14 @@ def solve_9(task):
     result = result.e.to_token_string()
     task.solve = result
 
+literal_solves = {
+            1 : 'UDLLLDURRRRRURR',
+            3 : 'DRDRLLLUDLLUURURLLRULUURRDRURRDLDLRDURDD'
+        }
+
 def test():
-    t = Task(1)
-    t.literal('UDLLLDURRRRRURR')
+    t = Task(3)
+    t.literal(literal_solves[3])
     t.submit()
 
     # submit(1, literal(1, 'UDLLLDURRRRRURR'))

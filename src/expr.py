@@ -28,6 +28,56 @@ def int_div(x, y):
 def int_mod(x, y):
     return x - y * int_div(x, y)
 
+def decode_integer(name):
+    value = 0
+    for c in name:
+        value *= N94
+        value += ord(c) - 33
+    return value
+
+def decode_string(name):
+    return ''.join([str_chars[ord(c) - 33] for c in name])
+
+def encode_integer(i):
+    result = []
+    if i == 0:
+        result.append(base94[0])
+    while i > 0:
+        result.append(base94[i % N94])
+        i = (i // N94)
+    return 'I' + ''.join(reversed(result))
+
+def encode_string(s):
+    result = []
+    for c in s:
+        idx = str_chars.find(c)
+        assert idx >= 0
+        result.append(base94[idx])
+    return 'S' + ''.join(result)
+
+def str2int(s):
+    value = 0
+    for c in s:
+        idx = str_chars.find(c)
+        assert idx >= 0
+        value *= N94
+        value += idx
+    return value
+
+def int2str(i):
+    result = []
+    while i > 0:
+        result.append(str_chars[i % N94])
+        i = (i // N94)
+    return ''.join(reversed(result))
+
+unaryops = {
+        '-' : (int, lambda x : -x),
+        '!' : (bool, lambda x : not x),
+        '#' : (str, str2int),
+        '$' : (int, int2str)
+        }
+
 binaryops = {
         '+' : (int, int, lambda x, y : x + y),
         '-' : (int, int, lambda x, y : x - y),
@@ -50,6 +100,8 @@ class TreeExpr:
         self.indicator = token[0]
         self.name = token[1:]
         self.args = args
+        self.value = None
+        self.substitution_result = None
 
     # static
     def from_token_string(token_string):
@@ -125,49 +177,6 @@ class TreeExpr:
         else:
             assert False
 
-def decode_integer(name):
-    value = 0
-    for c in name:
-        value *= N94
-        value += ord(c) - 33
-    return value
-
-def decode_string(name):
-    return ''.join([str_chars[ord(c) - 33] for c in name])
-
-def encode_integer(i):
-    result = []
-    if i == 0:
-        result.append(base94[0])
-    while i > 0:
-        result.append(base94[i % N94])
-        i = (i // N94)
-    return 'I' + ''.join(reversed(result))
-
-def encode_string(s):
-    result = []
-    for c in s:
-        idx = str_chars.find(c)
-        assert idx >= 0
-        result.append(base94[idx])
-    return 'S' + ''.join(result)
-
-def str2int(s):
-    value = 0
-    for c in s:
-        idx = str_chars.find(c)
-        assert idx >= 0
-        value *= N94
-        value += idx
-    return value
-
-def int2str(i):
-    result = []
-    while i > 0:
-        result.append(str_chars[i % N94])
-        i = (i // N94)
-    return ''.join(reversed(result))
-
 def eval_expr(expr, desired_type = None):
     result = None
     while result is None:
@@ -223,6 +232,83 @@ def eval_expr(expr, desired_type = None):
     assert desired_type in [None, type(result)]
     return result
 
+def eval_expr_inplace(expr):
+    todolist = [expr]
+    while (expr.value is None) or len(todolist) > 0:
+        if not (expr.value is None):
+            expr = todolist.pop()
+            continue
+
+        t = expr.token
+        i = expr.indicator
+        name = expr.name
+        args = expr.args
+
+        if t == 'B$':
+            if expr.substitution_result is None:
+                todolist.append(expr)
+                if args[0].value is None:
+                    expr = args[0]
+                else:
+                    function = args[0].value
+                    assert function.indicator == 'L'
+                    expr.substitution_result = function.args[0].substitute(function.name, args[1])
+                    expr = expr.substitution_result
+            else:
+                if expr.substitution_result.value is None:
+                    todolist.append(expr)
+                    expr = expr.substitution_result
+                else:
+                    expr.value = expr.substitution_result.value
+        elif t == '?':
+            if args[0].value is None:
+                todolist.append(expr)
+                expr = args[0]
+            else:
+                if args[0].value:
+                    sub = args[1]
+                else:
+                    sub = args[2]
+
+                if sub.value is None:
+                    todolist.append(expr)
+                    expr = sub
+                else:
+                    expr.value = sub.value
+        elif i in ['L', 'v']:
+            expr.value = expr
+        elif i in ['T', 'F', 'I', 'S']:
+            if i == 'T':
+                expr.value = True
+            if i == 'F':
+                expr.value = False
+            if i == 'I':
+                expr.value = decode_integer(name)
+            if i == 'S':
+                expr.value = decode_string(name)
+        elif i == 'U':
+            if args[0].value is None:
+                todolist.append(expr)
+                expr = args[0]
+            else:
+                expr.value = unaryops[name][1](args[0].value)
+        elif i == 'B':
+            if args[0].value is None:
+                todolist.append(expr)
+                expr = args[0]
+            elif args[1].value is None:
+                todolist.append(expr)
+                expr = args[1]
+            else:
+                expr.value = binaryops[name][2](
+                        args[0].value,
+                        args[1].value)
+                # No shortcutting | and &
+        else:
+            assert False
+
+    return expr.value
+
 tests = [
         ('I-', 12),
         ("U- I$", -3),
@@ -255,7 +341,8 @@ def run_tests():
         expr = TreeExpr.from_token_string(token_string)
         result = None
         try:
-            result = eval_expr(expr)
+            # result = eval_expr(expr)
+            result = eval_expr_inplace(expr)
         except:
             print(token_string)
             print(expr)
@@ -269,7 +356,8 @@ def run_tests():
             print('  goal:', goal)
 
 def evaluate_string(s):
-    return eval_expr(TreeExpr.from_token_string(s))
+    # return eval_expr(TreeExpr.from_token_string(s))
+    return eval_expr_inplace(TreeExpr.from_token_string(s))
 
 def repl():
     print([encode_integer(i) for i in range(20)])
