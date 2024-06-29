@@ -38,7 +38,8 @@ def download_tasks(course = None):
 
                     if course == 'efficiency':
                         f.write('\n\n')
-                        f.write(expr.TreeExpr.from_token_string(response).pretty_print())
+                        # f.write(expr.TreeExpr.from_token_string(response).pretty_print())
+                        f.write(expr.TreeExpr.from_token_string(response).pretty_print_inplace())
 
                     f.write('\n')
 
@@ -143,7 +144,7 @@ def submit(course, idx, solution, check_if_better_exists = True):
 
 def run():
     view_scores()
-    # download_tasks('lambdaman')
+    # download_tasks('efficiency')
 
 if __name__ == '__main__':
     run()

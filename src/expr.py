@@ -177,6 +177,41 @@ class TreeExpr:
         else:
             assert False
 
+    def pretty_print_inplace(self):
+        pp = {}
+        cur = self
+        todolist = []
+        while not (self in pp):
+            if cur in pp:
+                cur = todolist.pop()
+
+            if all([a in pp for a in cur.args]):
+                if cur.indicator == 'I':
+                    pp[cur] = [str(decode_integer(cur.name))]
+                elif cur.indicator == 'S':
+                    pp[cur] = ['«', decode_string(cur.name), '»']
+                elif cur.indicator in 'TF':
+                    pp[cur] = [cur.indicator]
+                elif cur.indicator == 'L':
+                    pp[cur] = ['λ', cur.name, ': '] + pp[cur.args[0]]
+                elif cur.indicator == 'v':
+                    pp[cur] = [cur.token]
+                elif cur.indicator == 'U':
+                    pp[cur] = [cur.name, ' '] + pp[cur.args[0]]
+                elif cur.indicator == 'B':
+                    pp[cur] = (['('] + pp[cur.args[0]] + [') ', cur.name, ' (']
+                               + pp[cur.args[1]] + [')'])
+                elif cur.indicator == '?':
+                    pp[cur] = (['('] + pp[cur.args[0]] + [') ? '] +
+                               pp[cur.args[1]] + [' : ('] + pp[cur.args[2]] + [')'])
+                else:
+                    assert False
+            else:
+                todolist.append(cur)
+                todolist.extend(cur.args)
+                cur = todolist.pop()
+        return ''.join(pp[self])
+
 def eval_expr(expr, desired_type = None):
     result = None
     while result is None:
