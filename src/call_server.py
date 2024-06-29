@@ -35,8 +35,8 @@ def repl():
         print()
         pass
 
-# also scoreboard, efficiency
-pages = ['index', 'lambdaman', 'spaceship', '3d']
+# also scoreboard 
+pages = ['index', 'lambdaman', 'spaceship', '3d', 'efficiency']
 def save_page(page_name):
     response = post_icfp(expr.encode_string('get ' + page_name))
     text = expr.evaluate_string(response)

@@ -272,6 +272,7 @@ def evaluate_string(s):
     return eval_expr(TreeExpr.from_token_string(s))
 
 def repl():
+    print([encode_integer(i) for i in range(20)])
     import readline
     try:
         while True:
