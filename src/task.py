@@ -78,10 +78,6 @@ def submit(course, idx, solution, check_if_better_exists = True):
     else:
         print(f"Submitting with a score of {score}.")
 
-    with open(f'../output/{course}/solve_{idx:04}_{score}', 'w') as f:
-        f.write(solution)
-        f.write('\n')
-
     icfp = c.prepare_submission(idx, solution)
     response = call_server.post_icfp(icfp)
 
@@ -92,10 +88,15 @@ def submit(course, idx, solution, check_if_better_exists = True):
         raise
     finally:
         print(response)
-        with open(f'../output/{course}/response_{idx:04}_{score}', 'w') as f:
-            f.write(response)
-            f.write('\n')
-
+        if 'wrong' not in response:
+            with open(f'../output/{course}/solve_{idx:04}_{score}', 'w') as f:
+                f.write(solution)
+                f.write('\n')
+            with open(f'../output/{course}/response_{idx:04}_{score}', 'w') as f:
+                f.write(response)
+                f.write('\n')
+        else:
+            print('Not writing solve and response because the solve was wrong.')
     time.sleep(2)
 
 def run():
