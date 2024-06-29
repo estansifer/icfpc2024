@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#define REGULARIZATION 1
+
 typedef struct pt {
     double x;
     double y;
@@ -114,25 +116,12 @@ static pt move_to_point(pt a, pt v, pt b, double distance, bool print)
     return v;
 }
 
-static int compare_pt_y(const void *a, const void *b)
-{
-    return (int)(((const pt *)a)->y) - (int)(((const pt *)b)->y);
-}
-
 int main(int argc, char **argv)
 {
     FILE *f = fopen(argv[1], "r");
     int fx, fy;
     while (fscanf(f, "%d %d", &fx, &fy) == 2)
         points[npoints++] = (pt){ fx, fy };
-    // qsort(points + 1, npoints - 1, sizeof(pt), compare_pt_y);
-    // pt velocity = { 0 };
-    // for (int i = 0; i < npoints - 1; ++i) {
-    //     double dist = distance(points[i], velocity, points[i + 1]);
-    //     velocity = move_to_point(points[i], velocity, points[i + 1], dist, true);
-    // }
-    // printf("\n");
-    // return 0;
 #if 1
     pt current = { 0 };
     pt velocity = { 0 };
@@ -145,10 +134,12 @@ int main(int argc, char **argv)
             double dx = current.x - points[i].x;
             double dy = current.y - points[i].y;
             double dfake = d;
+#if REGULARIZATION
             if (dx > dy)
-                dfake += 0.25 * dx;
+                dfake += dx;
             else
-                dfake += 0.25 * dy;
+                dfake += dy;
+#endif
             if (dfake < best) {
                 best = dfake;
                 best_actual = d;
