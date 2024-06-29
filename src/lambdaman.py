@@ -22,7 +22,8 @@ class Task:
         self.ncol = None
         self.solve = None
 
-        if not (idx in [10, 21]):
+        # if not (idx in [10, 21]):
+        if True:
             self.board = []
             with open(f'../input/lambdaman/{idx:03d}', 'r') as f:
                 for line in f:
@@ -89,9 +90,11 @@ literal_solves = {
         }
 
 def test():
-    t = Task(3)
-    t.literal(literal_solves[3])
-    t.submit()
+    Task(10).display()
+    Task(21).display()
+    # t = Task(3)
+    # t.literal(literal_solves[3])
+    # t.submit()
 
     # submit(1, literal(1, 'UDLLLDURRRRRURR'))
     # submit(6, solve_6())

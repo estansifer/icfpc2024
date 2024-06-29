@@ -232,6 +232,30 @@ def eval_expr(expr, desired_type = None):
     assert desired_type in [None, type(result)]
     return result
 
+def substitute_inplace(expr, var_name, var_value):
+    cur = expr
+    subs = {}
+    todolist = []
+    while not (expr in subs):
+        if cur in subs:
+            cur = todolist.pop()
+            continue
+
+        if cur.indicator == 'L' and cur.name == var_name:
+            subs[cur] = cur
+        elif cur.indicator == 'v' and cur.name == var_name:
+            subs[cur] = var_value
+        elif len(cur.args) == 0:
+            subs[cur] = cur
+        else:
+            if all([a in subs for a in cur.args]):
+                subs[cur] = TreeExpr(cur.token, [subs[a] for a in cur.args])
+            else:
+                todolist.append(cur)
+                todolist.extend(cur.args)
+                cur = todolist.pop()
+    return subs[expr]
+
 def eval_expr_inplace(expr):
     todolist = [expr]
     while (expr.value is None) or len(todolist) > 0:
@@ -252,7 +276,11 @@ def eval_expr_inplace(expr):
                 else:
                     function = args[0].value
                     assert function.indicator == 'L'
-                    expr.substitution_result = function.args[0].substitute(function.name, args[1])
+                    # expr.substitution_result = function.args[0].substitute(function.name, args[1])
+                    expr.substitution_result = substitute_inplace(
+                            function.args[0],
+                            function.name,
+                            args[1])
                     expr = expr.substitution_result
             else:
                 if expr.substitution_result.value is None:
@@ -339,6 +367,7 @@ def run_tests():
         print('** running test **')
 
         expr = TreeExpr.from_token_string(token_string)
+
         result = None
         try:
             # result = eval_expr(expr)

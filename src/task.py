@@ -143,7 +143,7 @@ def submit(course, idx, solution, check_if_better_exists = True):
 
 def run():
     view_scores()
-    download_tasks('efficiency')
+    # download_tasks('lambdaman')
 
 if __name__ == '__main__':
     run()
