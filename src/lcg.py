@@ -1,4 +1,5 @@
 import call_server
+from collections import deque
 import expr
 from expr_dsl import *
 import functools
@@ -72,6 +73,33 @@ class Board:
                     if d2 < min_distance_squared:
                         min_distance_squared = d2
         return min_distance_squared
+    def steps_to_closest_pellet(self, state):
+        lx = state[0]
+        ly = state[1]
+        pellets_taken = state[3]
+        height = len(self.rows)
+        width = len(self.rows[0])
+        lengths = [99999999] * width * height
+        lengths[ly * width + lx] = 0
+        queue = deque([(lx, ly)])
+        while len(queue) > 0:
+            x, y = queue.popleft()
+            length = lengths[y * width + x]
+            if self.rows[y][x] == '.' and (x, y) not in pellets_taken:
+                return length
+            if y > 0 and self.rows[y - 1][x] != '#' and length + 1 < lengths[(y - 1) * width + x]:
+                lengths[(y - 1) * width + x] = length + 1
+                queue.append((x, y - 1))
+            if y < len(self.rows) - 1 and self.rows[y + 1][x] != '#' and length + 1 < lengths[(y + 1) * width + x]:
+                lengths[(y + 1) * width + x] = length + 1
+                queue.append((x, y + 1))
+            if x > 0 and self.rows[y][x - 1] != '#' and length + 1 < lengths[y * width + x - 1]:
+                lengths[y * width + x - 1] = length + 1
+                queue.append((x - 1, y))
+            if x < len(self.rows[y]) - 1 and self.rows[y][x + 1] != '#' and length + 1 < lengths[y * width + x + 1]:
+                lengths[y * width + x + 1] = length + 1
+                queue.append((x + 1, y))
+        return 99999999
 
 params = 'glibc'
 
@@ -103,12 +131,12 @@ elif params == 'glibc':
             state = (state * 1103515245 + 12345) % (2 ** 31)
         return result
 
-steps_per_seed = 10000
+steps_per_seed = 20000
 seeds_to_try = 5000
 
 steps_for_seed = [pyfunc(seed, steps_per_seed) for seed in range(seeds_to_try)]
 
-for idx in range(20, 22):
+for idx in range(12, 16):
     try:
         board = Board(idx)
     except:
@@ -120,12 +148,14 @@ for idx in range(20, 22):
     while total_steps < 1000000 and (state is None or state[2] > 0):
         min_seed = 0
         min_next_state = None
+        min_steps = 9999999999
         for seed in range(seeds_to_try):
             next_state = board.sim(steps_for_seed[seed], previous_state=state)
-            if min_next_state is None or next_state[2] < min_next_state[2] or (next_state[2] == min_next_state[2] and board.distance_squared_to_closest_pellet(next_state) < board.distance_squared_to_closest_pellet(min_next_state)):
+            if min_next_state is None or next_state[2] < min_next_state[2] or (next_state[2] == min_next_state[2] and board.steps_to_closest_pellet(next_state) < min_steps):
                 min_next_state = next_state
                 min_seed = seed
-                print(seed, board.pellets, next_state[2], board.distance_squared_to_closest_pellet(next_state))
+                min_steps = board.steps_to_closest_pellet(next_state)
+                print(seed, board.pellets, next_state[2], min_steps)
                 if next_state[2] == 0:
                     break
         seeds.append(min_seed)
