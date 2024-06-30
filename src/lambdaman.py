@@ -84,25 +84,52 @@ def solve_9(task):
     result = result.e.to_token_string()
     task.solve = result
 
+def solve_19(task):
+    U, D, R, L = S('U'), S('D'), S('R'), S('L')
+    assert task.idx == 19
+    body = lam(lambda Y:
+        Y(lam(lambda foo:
+            lam(lambda n :
+            lam(lambda r :
+            lam(lambda n_ : If(n == zero,
+               S(''),
+               r(U) @ foo(n_) @ r(D) @ r(L) @ foo(n_) @ r(R) @ r(D) @ foo(n_) @ r(U) @ r(R) @ foo(n_) @ r(L))
+            )(n / I(2))
+            )(
+                lam(lambda c:
+                    Y(lam(lambda repeat:
+                        lam(lambda k:
+                            If(k == one, c, c @ repeat(k - one))
+                    )))(n))
+            ))
+        ))(I(64))
+    )(ycomb())
+
+    result = S('solve lambdaman19 ') @ body
+    result = result.e.to_token_string()
+    # check = expr.evaluate_string(result)
+    # print(check)
+    # print(len(check))
+    # print(len(result))
+    task.solve = result
+
 literal_solves = {
             1 : 'UDLLLDURRRRRURR',
             3 : 'DRDRLLLUDLLUURURLLRULUURRDRURRDLDLRDURDD'
         }
 
 def test():
-    Task(10).display()
-    Task(21).display()
-    # t = Task(3)
+    t = Task(19)
+    solve_19(t)
     # t.literal(literal_solves[3])
-    # t.submit()
+    t.submit()
 
     # submit(1, literal(1, 'UDLLLDURRRRRURR'))
     # submit(6, solve_6())
     # submit(9, solve_9())
 
     # for i in range(1, 22):
-        # if not i in [10, 21]:
-            # Task(i).display()
+        # Task(i).display()
 
 if __name__ == '__main__':
     test()
