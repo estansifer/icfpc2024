@@ -26,6 +26,16 @@ acc_code = {
     }
 
 def graph(idx, acc_file = None):
+    if idx[-1] == 'a':
+        folder = '../spaceship/results/levels/'
+        idx = int(idx[:-1])
+    elif idx[-1] == 'b':
+        folder = '../spaceship/results/tweak/levels/'
+        idx = int(idx[:-1])
+    else:
+        idx = int(idx)
+        folder = '../spaceship/results/tweak-factor-0.25/levels/'
+
     import matplotlib
     matplotlib.use('qtagg')
     import matplotlib.pyplot as plt
@@ -41,7 +51,7 @@ def graph(idx, acc_file = None):
     accs = []
 
     if acc_file is None:
-        acc_file = f'../spaceship/results/levels/{idx}.txt'
+        acc_file = folder + f'{idx}.txt'
 
     if not (acc_file is None):
         if os.path.exists(acc_file):
@@ -67,7 +77,7 @@ def graph(idx, acc_file = None):
 
 def run():
     import sys
-    graph(int(sys.argv[1]))
+    graph(sys.argv[1])
 
 if __name__ == '__main__':
     run()
