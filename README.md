@@ -11,7 +11,7 @@ gets lambdaman as close to solving the maze as possible.  In the latter case, we
 find a new best seed for the next sequence of moves, and so on.
 
 To encode a list of seeds, there are two strategies used.  The first generates
-an expression like f(seed1) @ f(seed2) @ f(seed3) ..., which has some overhead
+an expression like f(seed1) . f(seed2) . f(seed3) ..., which has some overhead
 for the repeated references to f and concatenation operations.  The second
 creates a function which can be called with each seed in sequence, like
 f(seed1)(seed2)(seed3)....  To end the sequence, a terminator value different
