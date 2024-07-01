@@ -11,6 +11,9 @@ class Course_LM:
     def score(self, solution):
         return len(solution)
 
+    def format_solution(self, solution):
+        return solution
+
     def prepare_submission(self, idx, solution):
         return solution
 

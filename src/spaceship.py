@@ -1,4 +1,5 @@
 import expr
+from expr_dsl import *
 
 class Course_S:
     def __init__(self):
@@ -7,11 +8,15 @@ class Course_S:
     # evaluate
     # solution is a string consisting of a list of integers
     def score(self, solution):
-        return len(solution)
+        # return len(expr.eval_expr_inplace(solution.e))
+        return None
+
+    def format_solution(self, solution):
+        return solution.e.to_token_string()
 
     # create string for submitting to website
     def prepare_submission(self, idx, solution):
-        return expr.encode_string(f'solve spaceship{idx} {solution}')
+        return (S(f'solve spaceship{idx} ') @ solution).e.to_token_string()
 
 acc_code = {
         '1' : (-1, -1),

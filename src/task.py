@@ -133,7 +133,7 @@ def submit(course, idx, solution, check_if_better_exists = True):
         print(response)
         if 'wrong' not in response:
             with open(f'../output/{course}/solve_{idx:04}_{score}', 'w') as f:
-                f.write(solution)
+                f.write(c.format_solution(solution))
                 f.write('\n')
             with open(f'../output/{course}/response_{idx:04}_{score}', 'w') as f:
                 f.write(response)

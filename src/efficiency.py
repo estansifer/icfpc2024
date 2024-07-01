@@ -9,6 +9,9 @@ class Course_Efficiency:
     def score(self, solution):
         return 1
 
+    def format_solution(self, solution):
+        return solution
+
     def prepare_submission(self, idx, solution):
         return expr.encode_string(f'solve efficiency{idx} {solution}')
 
