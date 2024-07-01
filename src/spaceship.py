@@ -8,7 +8,8 @@ class Course_S:
     # evaluate
     # solution is a string consisting of a list of integers
     def score(self, solution):
-        return len(expr.eval_expr_inplace(solution.e))
+        # return len(expr.eval_expr_inplace(solution.e))
+        return None
 
     def format_solution(self, solution):
         return solution.e.to_token_string()

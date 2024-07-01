@@ -17,7 +17,7 @@ def encode(encode_run):
             runlength = 1
         elif c == run:
             runlength += 1
-        elif runlength < 100:
+        elif runlength < 25:
             unencoded += run * runlength
             run = c
             runlength = 1
@@ -28,7 +28,7 @@ def encode(encode_run):
             unencoded = ''
             run = c
             runlength = 1
-    if runlength < 100:
+    if runlength < 25:
         unencoded += run * runlength
         e = e @ S(unencoded)
     else:
@@ -48,8 +48,5 @@ for path in Path(sys.argv[1]).rglob('*.txt'):
             )
         )))
     ))
-    if contents != expr.eval_expr_inplace(result.e):
-        print(contents)
-        print(expr.eval_expr_inplace(result.e))
-        break
+    print(len(contents), len(result.e.to_token_string()))
     task.submit('spaceship', int(path.stem), result)
