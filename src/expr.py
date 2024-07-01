@@ -142,13 +142,23 @@ class TreeExpr:
         return ' '.join(self.to_token_list())
 
     def all_variables(self, vs = None):
-        if vs is None:
-            vs = set()
-        if self.indicator == 'v':
-            vs.add(self.name)
-        for arg in self.args:
-            arg.all_variables(vs)
-        return vs
+        vs = {}
+        todolist = [self]
+        while len(todolist) > 0:
+            cur = todolist.pop()
+            if cur.indicator == 'v':
+                vs.add(cur.name)
+            todolist.extend(cur.args)
+
+        return list(vs)
+
+        # if vs is None:
+            # vs = set()
+        # if self.indicator == 'v':
+            # vs.add(self.name)
+        # for arg in self.args:
+            # arg.all_variables(vs)
+        # return vs
 
     def __str__(self):
         if len(self.args) == 0:
