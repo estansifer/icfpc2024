@@ -133,10 +133,17 @@ class TreeExpr:
     def to_token_list(self, accum = None):
         if accum is None:
             accum = []
-        accum.append(self.token)
-        for arg in self.args:
-            arg.to_token_list(accum)
+        todolist = [self]
+        while len(todolist) > 0:
+            cur = todolist.pop()
+            accum.append(cur.token)
+            todolist.extend(cur.args[::-1])
         return accum
+
+        # accum.append(self.token)
+        # for arg in self.args:
+            # arg.to_token_list(accum)
+        # return accum
 
     def to_token_string(self):
         return ' '.join(self.to_token_list())
