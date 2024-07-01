@@ -276,22 +276,23 @@ def read_grid(idx, A, B):
 
 def test():
     A = 1621823881
-    # A = 58
-    g = read_grid(12, A, 0)
-    F = 10 ** 9
-    # F = 64
-    max_n = 17
-    tt = test_taylor(A, F, max_n)
-    print('A:', A)
-    print('F:', F)
-    print('max n:', max_n)
-    print('Simulation result:', simulate(g))
-    print('formula result:', tt[0])
-    print('sine:', tt[1], tt[2])
+    for A in [-1612893, -1621823881, 1621823881, 0, 20, 1, -1, 1000324]:
+        # A = 58
+        g = read_grid(12, A, 0)
+        F = 10 ** 9
+        # F = 64
+        max_n = 17
+        tt = test_taylor(A, F, max_n)
+        print('A:', A)
+        print('F:', F)
+        print('max n:', max_n)
+        print('Simulation result:', simulate(g))
+        print('formula result:', tt[0])
+        print('sine:', tt[1], tt[2])
 
-    # test_taylor(A, B, max_n, verbose = True)
+        # test_taylor(A, B, max_n, verbose = True)
 
-    # simulate(g, verbose = True)
+        # simulate(g, verbose = True)
 
 def run():
     submit(12)
