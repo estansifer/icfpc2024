@@ -38,6 +38,54 @@ answers = [
         2 ** 29 + 7  # 13
     ]
 
+def deduce(N, conds_, guesses, deductions = None):
+    if deductions is None:
+        ded_yes = 0
+        ded_no = 0
+        for k, sign in guesses:
+            if sign == 1:
+                ded_yes = ded_yes + (2 ** k)
+            else:
+                ded_no = ded_no + (2 ** k)
+    else:
+        ded_yes, ded_no, _ = deductions
+
+    conds = list(conds_)
+
+    flag = True
+    while flag:
+        flag = False
+
+        for cond in list(conds):
+            y, n = cond
+
+            fails = (y & ded_no) | (n & ded_yes)
+            k = fails.bit_count()
+            # Failed?
+            if k == 3:
+                return False
+
+            # Neutral?
+            if (y & ded_yes) == (n & ded_no): # == 0
+                # up to 2?
+                if k == 2:
+                    flag = True
+                    other = (y + n) - fails
+
+                    if (other & y) > 0:
+                        ded_yes = ded_yes | other
+                    else:
+                        ded_no = ded_no | other
+            else:
+                # passed!
+                conds.remove(cond)
+                flag = True
+
+        if len(conds) == 0:
+            return (ded_yes, ded_no, True)
+
+    return (ded_yes, ded_no, False)
+
 def sat(idx):
     l = None
     with open(f'../input/efficiency/raw_{idx:03}', 'r') as f:
