@@ -19,7 +19,7 @@ def submit(idx):
 
     task.submit('3d', idx, solve)
 
-def test_taylor(A = None, B = 10 ** 9, max_n = 17, verbose = False):
+def test_taylor(A = None, F = 10 ** 9, max_n = 17, verbose = False):
     import math
 
     def sin(x):
@@ -27,7 +27,7 @@ def test_taylor(A = None, B = 10 ** 9, max_n = 17, verbose = False):
         x_n = x
         accum = 0
         fact = 1
-        B_n = 1
+        F_n = 1
 
         while n < max_n:
             if verbose:
@@ -36,27 +36,54 @@ def test_taylor(A = None, B = 10 ** 9, max_n = 17, verbose = False):
                 print('x ^ n', x_n)
                 print('accum', accum)
                 print('fact', fact)
-                print('B_n', B_n)
-            accum = B * n * accum + (n % 2) * ((n % 4) - 2) * x_n
+                print('F_n', F_n)
+            accum = F * n * accum + (n % 2) * ((n % 4) - 2) * x_n
             x_n = x * x_n
-            B_n = B * B_n
+            F_n = F * F_n
             fact = n * fact
             n = n + 1
 
-        return - (((accum * B) // B_n) // fact)
+        return - (((accum * F) // F_n) // fact)
+
+    def sin2(x):
+        a = 1
+        b = 1
+        c = 1
+        d = 1
+        e = 1
+        f = 0
+        g = 0
+
+        while a < max_n:
+            if verbose:
+                print('**** new step ****')
+                print('a: n + 1', a)
+                print('b: x ^ n', b)
+                print('g: accum', g)
+                print('e: fact', e)
+                print('d: F_n', d)
+            f, g = g, b * 99 // (e * d) - f
+            e = a * e
+            d = c * d
+            c = F
+            b = x * b
+            a = a + 1
+
+        return g // (-99)
 
     if A is None:
         import numpy as np
         def check(x):
-            a = int(math.sin(x) * B)
-            b = sin(int(x * B))
-            print(a, b, a + b)
+            a = int(math.sin(x) * F)
+            b = sin2(int(x * F))
+            print(a, b, a - b)
 
-        for x in np.linspace(-1.6, 1.6, 200):
+        # for x in np.linspace(-1.6, 1.6, 200):
+        for x in [-1, -0.5, 0, 0.5, 1]:
             check(x)
     else:
-        ra = sin(int(A))
-        rb = int(math.sin(A / B) * B)
+        ra = sin2(int(A))
+        rb = int(math.sin(A / F) * F)
         return (ra, rb, ra - rb)
 
 def grid_print(grid):
@@ -181,7 +208,7 @@ def simulate(grid, verbose = False, maxsteps = 100):
         output = None
         for row in range(nrow):
             for col in range(ncol):
-                if gss[row][col] == 'S':
+                if still[row][col] and (gss[row][col] == 'S'):
                     if not (newgrid[row][col] is None):
                         assert output in [newgrid[row][col], None]
                         output = newgrid[row][col]
@@ -245,13 +272,15 @@ def read_grid(idx, A, B):
     return rows
 
 def test():
-    A = 150
+    A = 1621823881
+    # A = 58
     g = read_grid(12, A, 0)
-    B = 64
-    max_n = 6
-    tt = test_taylor(A, B, max_n)
+    F = 10 ** 9
+    # F = 64
+    max_n = 17
+    tt = test_taylor(A, F, max_n)
     print('A:', A)
-    print('B:', B)
+    print('F:', F)
     print('max n:', max_n)
     print('Simulation result:', simulate(g))
     print('formula result:', tt[0])
@@ -262,10 +291,11 @@ def test():
     # simulate(g, verbose = True)
 
 def run():
+    submit(12)
     # test()
     # submit(9)
     # test_taylor()
-    submit(1)
+    # submit(1)
 
     # g = read_grid(1, 1, 0)
     # simulate(g, verbose = True)
