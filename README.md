@@ -18,8 +18,8 @@ f(seed1)(seed2)(seed3)....  To end the sequence, a terminator value different
 from any seed is picked.  The fixed overhead of this mechanism is higher, but it
 scales better to large numbers of seeds.
 
-Two of the fractals (Hilbert curve and L19) and several of the small or empty
-fields were solved by hand or special cases.
+One of the fractals (L19; edit *not* the Hilbert curve) and several of the small
+or empty fields were solved by hand or special cases.
 
 ## spaceship
 
