@@ -1,6 +1,38 @@
 # Panicked Albatross -- icfpc2024
 
-We are a two person team working in python and C
+We are a two person team working in Python and C
+
+## lambdaman
+
+The idea here is to use a random number generator to generate the list of
+directions for lambdaman to move in.  By trying a bunch of seeds, we can find
+either a seed which generates a solution directly, or, failing that, a seed that
+gets lambdaman as close to solving the maze as possible.  In the latter case, we
+find a new best seed for the next sequence of moves, and so on.
+
+To encode a list of seeds, there are two strategies used.  The first generates
+an expression like f(seed1) @ f(seed2) @ f(seed3) ..., which has some overhead
+for the repeated references to f and concatenation operations.  The second
+creates a function which can be called with each seed in sequence, like
+f(seed1)(seed2)(seed3)....  To end the sequence, a terminator value different
+from any seed is picked.  The fixed overhead of this mechanism is higher, but it
+scales better to large numbers of seeds.
+
+## spaceship
+
+The most interesting thing here is the distance() function, which determines how
+many steps it takes to get from one point to another with a given starting
+velocity.  The insight is that all points between the curve of constant
+acceleration and the curve of constant deceleration are accessible.  Both of
+these curves are parabolas, so you can solve a quadratic equation to find the
+accessible ranges -- then intersect them to find the minimum point that's in
+both the x range and the y range.
+
+From there, the code does a greedy search using a weighted combination of this
+distance function and the simple manhattan distance function that ignores
+velocity.  It could probably be improved by separating route planning and
+velocity management.  As-is, the code simply accelerates to get to the next
+point as soon as it can.
 
 ## sine function
 
