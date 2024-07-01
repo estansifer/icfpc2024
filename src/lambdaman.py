@@ -69,6 +69,18 @@ def solve_6(task):
     result = tree.e.to_token_string()
     task.solve = result
 
+def solve_6b(task):
+    assert task.idx == 6
+    body = lam(lambda f:
+        f(f(f(f(f(f(S('RRRR'))))))))(
+        lam(lambda a: a @ a))
+
+    tree = S('solve lambdaman6 ') @ body
+    print(tree.e)
+    result = tree.e.to_token_string()
+    print(result)
+    task.solve = result
+
 def solve_9(task):
     assert task.idx == 9
     repeat = lam(lambda a:
@@ -115,12 +127,17 @@ def solve_19(task):
 
 literal_solves = {
             1 : 'UDLLLDURRRRRURR',
-            3 : 'DRDRLLLUDLLUURURLLRULUURRDRURRDLDLRDURDD'
+            3 : 'DRDRLLLUDLLUURURLLRULUURRDRURRDLDLRDURDD',
+            5 : 'RDLLLULURUDRURRRR'
         }
 
 def test():
-    t = Task(19)
-    solve_19(t)
+    # Task(5).display()
+    # Task(6).display()
+    # Task(9).display()
+    t = Task(6)
+    solve_6b(t)
+    # solve_19(t)
     # t.literal(literal_solves[3])
     t.submit()
 
