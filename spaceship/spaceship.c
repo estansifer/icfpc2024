@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #define REGULARIZATION 1
+#define NEAREST 1
 
 typedef struct pt {
     double x;
@@ -133,7 +134,11 @@ int main(int argc, char **argv)
             double d = distance(current, velocity, points[i]);
             double dx = current.x - points[i].x;
             double dy = current.y - points[i].y;
+#if NEAREST
+            double dfake = 0;
+#else
             double dfake = d;
+#endif
 #if REGULARIZATION
             if (dx > dy)
                 dfake += dx;
