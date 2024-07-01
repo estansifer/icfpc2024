@@ -31,6 +31,7 @@ acc_code = {
     }
 
 def graph(idx, acc_file = None):
+    raw_idx = idx
     if idx[-1] == 'a':
         folder = '../spaceship/results/levels/'
         idx = int(idx[:-1])
@@ -42,7 +43,8 @@ def graph(idx, acc_file = None):
         folder = '../spaceship/results/tweak-factor-0.25/levels/'
 
     import matplotlib
-    matplotlib.use('qtagg')
+    # matplotlib.use('qtagg')
+    matplotlib.use('agg')
     import matplotlib.pyplot as plt
     import os.path
 
@@ -78,11 +80,14 @@ def graph(idx, acc_file = None):
     plt.clf()
     plt.scatter([x for x, y in pts], [y for x, y in pts])
     plt.plot([x for x, y in path], [y for x, y in path])
-    plt.show()
+    plt.savefig(f'../output/spaceship/figs/{raw_idx}.png', dpi = 200)
 
 def run():
     import sys
-    graph(sys.argv[1])
+    for i in range(1, 24):
+        graph(str(i))
+        graph(str(i) + 'a')
+        graph(str(i) + 'b')
 
 if __name__ == '__main__':
     run()
