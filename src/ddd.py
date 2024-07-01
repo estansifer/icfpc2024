@@ -10,6 +10,9 @@ class Course_3D:
     def score(self, solution):
         return None
 
+    def format_solution(self, solution):
+        return solution
+
     def prepare_submission(self, idx, solution):
         return expr.encode_string(f'solve 3d{idx}\n' + solution + '\n')
 

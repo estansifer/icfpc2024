@@ -137,6 +137,12 @@ elif params == 'glibc_udlr':
             S("")
         )
     )))
+    func_y = lam(lambda f: lam(lambda steps: lam(lambda state:
+        (steps > I(0)).if_(
+            S("UDLR").drop((state + state / I(22351)) % I(4)).take(I(1)) @ f(steps - I(1))((state * I(1103515245) + I(12345)) % I(2 ** 31)),
+            S("")
+        )
+    )))
     def pyfunc(state, steps):
         result = ''
         for _ in range(steps):
@@ -144,13 +150,35 @@ elif params == 'glibc_udlr':
             state = (state * 1103515245 + 12345) % (2 ** 31)
         return result
 
-def submit_seeds(idx, steps_per_seed, seeds):
-    call = lam(lambda g:
+def call_with_reduce_append(steps_per_seed, seeds):
+    return lam(lambda g:
         lam(lambda f:
             functools.reduce(operator.matmul, map(lambda seed: f(I(seed)), seeds))
         )(g(g)(I(steps_per_seed)))
     )(func)
-    token_string = (S(f'solve lambdaman{idx} ') @ call).e.to_token_string()
+
+def call_with_repeated_apply(steps_per_seed, seeds):
+    smallest_not_in_seeds = 9999999999
+    for i in range(100):
+        if i not in seeds:
+            smallest_not_in_seeds = i
+            break
+    f = lam(lambda y:
+        y(
+            lam(lambda f: lam(lambda string: lam(lambda seed:
+                (seed == I(smallest_not_in_seeds)).if_(
+                    string,
+                    f(string @ y(func_y)(I(steps_per_seed))(seed))
+                )
+            )))
+        )(S(""))
+    )(ycomb())
+    for seed in seeds:
+        f = f(I(seed))
+    return f(I(smallest_not_in_seeds))
+
+def submit_seeds(idx, steps_per_seed, seeds, caller):
+    token_string = (S(f'solve lambdaman{idx} ') @ caller(steps_per_seed, seeds)).e.to_token_string()
     print(token_string)
     task.submit('lambdaman', idx, token_string)
 
@@ -162,13 +190,10 @@ for idx in range(1, 22):
                 line = line.strip()
                 if len(line) > 0:
                     seeds.append(int(line))
-        if len(seeds) > 0:
-            submit_seeds(idx, 20000, seeds)
     except:
         pass
-exit()
-
-submit_seeds(8, 100000, [13628, 83757, 22430, 87629, 33908, 0])
+    if len(seeds) > 0:
+        submit_seeds(idx, 20000, seeds, call_with_repeated_apply)
 exit()
 
 steps_per_seed = 8835
@@ -202,4 +227,4 @@ for idx in range(8, 9):
         state = min_next_state
         total_steps += steps_per_seed
     if state[2] == 0:
-        submit_seeds(idx, steps_per_seed, seeds)
+        submit_seeds(idx, steps_per_seed, seeds, call_with_reduce_append)
