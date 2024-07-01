@@ -142,7 +142,7 @@ class TreeExpr:
         return ' '.join(self.to_token_list())
 
     def all_variables(self, vs = None):
-        vs = {}
+        vs = set()
         todolist = [self]
         while len(todolist) > 0:
             cur = todolist.pop()
