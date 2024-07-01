@@ -101,13 +101,13 @@ class Board:
                 queue.append((x + 1, y))
         return 99999999
 
-params = 'glibc'
+params = 'glibc_udlr'
 
 if params == 'random0':
     # parameters via 'random0' (https://www1.udel.edu/CIS/106/pconrad/MPE3/code/chap5/random0.m)
-    func = lam(lambda state: lam(lambda steps: lam(lambda f:
+    func = lam(lambda f: lam(lambda steps: lam(lambda state:
         (steps > I(0)).if_(
-            S("UDRL").drop((state + state / I(2351)) % I(4)).take(I(1)) @ f((state * I(8121) + I(28411)) % I(134456))(steps - I(1))(f),
+            S("UDRL").drop((state + state / I(2351)) % I(4)).take(I(1)) @ f(f)(steps - I(1))((state * I(8121) + I(28411)) % I(134456)),
             S("")
         )
     )))
@@ -118,9 +118,9 @@ if params == 'random0':
             state = (state * 8121 + 28411) % 134456
         return result
 elif params == 'glibc':
-    func = lam(lambda state: lam(lambda steps: lam(lambda f:
+    func = lam(lambda f: lam(lambda steps: lam(lambda state:
         (steps > I(0)).if_(
-            S("UDRL").drop((state + state / I(22351)) % I(4)).take(I(1)) @ f((state * I(1103515245) + I(12345)) % I(2 ** 31))(steps - I(1))(f),
+            S("UDRL").drop((state + state / I(22351)) % I(4)).take(I(1)) @ f(f)(steps - I(1))((state * I(1103515245) + I(12345)) % I(2 ** 31)),
             S("")
         )
     )))
@@ -130,13 +130,53 @@ elif params == 'glibc':
             result += 'UDRL'[(state + state // 22351) % 4]
             state = (state * 1103515245 + 12345) % (2 ** 31)
         return result
+elif params == 'glibc_udlr':
+    func = lam(lambda f: lam(lambda steps: lam(lambda state:
+        (steps > I(0)).if_(
+            S("UDLR").drop((state + state / I(22351)) % I(4)).take(I(1)) @ f(f)(steps - I(1))((state * I(1103515245) + I(12345)) % I(2 ** 31)),
+            S("")
+        )
+    )))
+    def pyfunc(state, steps):
+        result = ''
+        for _ in range(steps):
+            result += 'UDLR'[(state + state // 22351) % 4]
+            state = (state * 1103515245 + 12345) % (2 ** 31)
+        return result
 
-steps_per_seed = 20000
-seeds_to_try = 5000
+def submit_seeds(idx, steps_per_seed, seeds):
+    call = lam(lambda g:
+        lam(lambda f:
+            functools.reduce(operator.matmul, map(lambda seed: f(I(seed)), seeds))
+        )(g(g)(I(steps_per_seed)))
+    )(func)
+    token_string = (S(f'solve lambdaman{idx} ') @ call).e.to_token_string()
+    print(token_string)
+    task.submit('lambdaman', idx, token_string)
+
+for idx in range(1, 22):
+    seeds = []
+    try:
+        with open(f'../lcg-seeds/100000_20000/{idx:03d}', 'r') as f:
+            for line in f:
+                line = line.strip()
+                if len(line) > 0:
+                    seeds.append(int(line))
+        if len(seeds) > 0:
+            submit_seeds(idx, 20000, seeds)
+    except:
+        pass
+exit()
+
+submit_seeds(8, 100000, [13628, 83757, 22430, 87629, 33908, 0])
+exit()
+
+steps_per_seed = 8835
+seeds_to_try = 8836
 
 steps_for_seed = [pyfunc(seed, steps_per_seed) for seed in range(seeds_to_try)]
 
-for idx in range(12, 16):
+for idx in range(8, 9):
     try:
         board = Board(idx)
     except:
@@ -162,10 +202,4 @@ for idx in range(12, 16):
         state = min_next_state
         total_steps += steps_per_seed
     if state[2] == 0:
-        print(seeds)
-        call = lam(lambda g:
-            functools.reduce(operator.matmul, map(lambda seed: g(I(seed))(I(steps_per_seed))(g), seeds))
-        )(func)
-        token_string = (S(f'solve lambdaman{idx} ') @ call).e.to_token_string()
-        print(token_string)
-        task.submit('lambdaman', idx, token_string)
+        submit_seeds(idx, steps_per_seed, seeds)
