@@ -102,6 +102,7 @@ class TreeExpr:
         self.args = args
         self.value = None
         self.substitution_result = None
+        self.size = 1 + sum([a.size for a in args])
 
     # static
     def from_token_string(token_string):
@@ -172,6 +173,13 @@ class TreeExpr:
             return self.token
         else:
             return self.token + '(' + ', '.join([str(arg) for arg in self.args]) + ')'
+
+    def walk(self, foo):
+        todolist = [self]
+        while len(todolist) > 0:
+            cur = todolist.pop()
+            foo(cur)
+            todolist.extend(cur.args[::-1])
 
     def pretty_print(self):
         p = [a.pretty_print() for a in self.args]

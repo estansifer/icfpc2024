@@ -18,6 +18,9 @@ f(seed1)(seed2)(seed3)....  To end the sequence, a terminator value different
 from any seed is picked.  The fixed overhead of this mechanism is higher, but it
 scales better to large numbers of seeds.
 
+Two of the fractals (Hilbert curve and L19) and several of the small or empty
+fields were solved by hand or special cases.
+
 ## spaceship
 
 The most interesting thing here is the distance() function, which determines how
@@ -50,7 +53,7 @@ which, if x = A / F for integer A and a large constant F = 10^9,
     F * sin(x) = A - A^3 / 3! / F^2 + ...
 
 [I explored a variety of alternative approaches for calculating sine but the final
-version used the most obvious one!]
+version used this most obvious one!]
 
 To compute each term, we need to compute A^n, F^n, and n!, each of which can be done
 iteratively. I first implemented the sine calculator in python to verify that it
@@ -67,14 +70,14 @@ verified it gave the same answers as my simulation of the 3d code also:
         g = 0       # other accumulator
 
         while a <= 20:
-            f, g = g, b * (-17) // (e * d) - f
+            f, g = g, b * (-20) // (e * d) - f
             e = a * e
             d = c * d
             c = F
             b = A * b
             a = a + 1
 
-        return g // 17
+        return g // 20
 
 Note that I compute both odd and even terms, but by switching accumulators every
 iteration all the odd terms go into one accumulator and all the even terms go into the
@@ -148,11 +151,11 @@ Compute F^(n - 1) (d := c * d):
     . -4  @  3  .  .  .
     .  .  3  .  .  .  .
 
-Accumulator (g := b * (-17) // (e * d) - f):
+Accumulator (g := b * (-20) // (e * d) - f):
 
     .  .  .  e  .  .  .
     .  .  d  *  .  .  .
-    . -17 .  .  .  f  .
+    . -20 .  .  .  f  .
     b  *  .  /  .  -  .
     .  .  .  .  .  .  .
     .  .  .  .  8  @ -4
@@ -165,11 +168,7 @@ Swap accumulator, and output (f := g):
     .  ^  .  v  S
     .  g  .  .  .
     .  . -6  @  8
-    .  .  >  .  .
-    .  ^  .  .  .
-    .  .  .  .  .
-    .  ^  .  .  .
-    .  3  .  .  .
+    .  .  .  3  .
 
 Compute A^n (b := A * b):
 
@@ -196,7 +195,7 @@ All together:
     .  ^  .  .  3  >  .  ^  .  >  .  .  .
     .  7  . -2  @  3  v  e  .  3  @  0  .
     .  .  .  <  .  <  d  *  .  .  3  A  .
-    .  c  *  .  . -17 .  .  .  f  0  =  .
+    .  c  *  .  . -20 .  .  .  f  0  =  .
     .  .  .  .  b  *  .  /  .  -  .  S  .
     . -4  @  3  v  .  .  .  .  .  .  .  .
     .  .  3  .  .  >  .  .  8  @ -4  A  .

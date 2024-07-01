@@ -38,12 +38,36 @@ answers = [
         2 ** 29 + 7  # 13
     ]
 
+def sat(idx):
+    l = None
+    with open(f'../input/efficiency/raw_{idx:03}', 'r') as f:
+        for line in f:
+            l = line.strip()
+            break
+
+    # print(l)
+
+    te = expr.TreeExpr.from_token_string(l)
+
+    def foo(e):
+        if e.token == 'B$' and e.args[1].size < 50:
+            print(e.args[0].token, ': ', e.args[1].pretty_print())
+
+        if e.token == '?':
+            print(e.token, e.size, e.args[0].size, e.args[1].size, e.args[2].size)
+            print(e.pretty_print())
+
+    te.walk(foo)
+
+
+
+
 def submit(idx):
     assert type(answers[idx]) == int
     task.submit('efficiency', idx, str(answers[idx]))
 
 def run():
-    pass
+    sat(7)
 
 if __name__ == '__main__':
     run()
